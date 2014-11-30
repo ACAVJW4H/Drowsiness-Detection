@@ -25,7 +25,7 @@ String face_cascade_name = "test/haarcascade_frontalface_alt.xml";
 String eyes_cascade_name = "test/haarcascade_eye_tree_eyeglasses.xml";
 CascadeClassifier face_cascade;
 CascadeClassifier eyes_cascade;
-s
+
 //Display window name
 string window_name = "Drowsiness Detection";
 
