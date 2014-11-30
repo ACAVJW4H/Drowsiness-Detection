@@ -12,6 +12,9 @@ Date:   12/08/2014
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
+#include <cstdlib>
+#include <fstream>
 
 //Declaring namespaces
 using namespace std;
@@ -19,6 +22,22 @@ using namespace cv;
 
 // Function headers 
 void detectAndDisplay (Mat frame, int index, int history[]);
+
+void push_help(int state, void *pointer)
+{
+    displayStatusBar("Drowsiness Detection", "Concentration Reminder considers 100 frames for drowsiness detection.\nIf system detects closed eyes in 30 or more frames, you are sleeping. \nElse, you are active", 0); 
+}
+
+void push_quit(int state, void *pointer)
+{
+    exit(0);
+}
+
+void push_pause(int state, void *pointer)
+{
+    waitKey(0);
+    displayStatusBar("Drowsiness Detection", "Press any key to resume detection", 0); 
+}
 
 // Global variables 
 String face_cascade_name = "test/haarcascade_frontalface_alt.xml";
@@ -38,12 +57,19 @@ int main( int argc, const char** argv )
     CvCapture* capture;
     Mat frame;
 
+    namedWindow(window_name, CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO);
+    resizeWindow(win_name, 1280, 960);
+    createButton("Pause", push_pause, (void*) "test", CV_PUSH_BUTTON, 1);
+    createButton("Help", push_help, (void*) "test", CV_PUSH_BUTTON, 1);
+    createButton("Quit", push_quit, (void*) "test", CV_PUSH_BUTTON, 1);
+
     //Load the cascades
     if (!face_cascade.load(face_cascade_name))
     { 
         printf("--(!)Error loading\n"); 
         return -1; 
     };
+
     if (!eyes_cascade.load(eyes_cascade_name))
     { 
         printf("--(!)Error loading\n"); 
@@ -134,18 +160,13 @@ int main( int argc, const char** argv )
                     }
                 }
             }
-
             int c = waitKey(10);
-            if( (char)c == 'c' ) 
-            { 
-                break;
-            }
-        } 
+        }
     }
     return 0;
 }
 
-/*************************************************************************
+/****************************************************************************************
 
 Function Name: detectAndDisplay
 Input: frame, index, history[]
@@ -155,7 +176,8 @@ Description: detectAndDisplay detects face and eyes from the input frame and dra
              inserted in the corresponding index of history[]. If closed eyes are 
              detected, value 1 is inserted in the corresponding index of history[].
 
-***************************************************************************/
+*****************************************************************************************/
+
 void detectAndDisplay( Mat frame, int index, int history[] )
 {
     std::vector<Rect> faces;
