@@ -20,20 +20,49 @@ Date:   12/08/2014
 using namespace std;
 using namespace cv;
 
-// Function headers 
 void detectAndDisplay (Mat frame, int index, int history[]);
 
-void push_help(int state, void *pointer)
+/*********************************************************************************
+
+Function Name: Help
+Description: Qt GUI in OpenCV provides a control panel to which buttons can be 
+             attached using the function, createButton. When the user presses 
+             Help button, a help manual is displayed on the status bar of Qt GUI.
+
+***********************************************************************************/
+
+void Help(int state, void *pointer)
 {
-    displayStatusBar("Drowsiness Detection", "Concentration Reminder considers 100 frames for drowsiness detection.\nIf system detects closed eyes in 30 or more frames, you are sleeping. \nElse, you are active", 0); 
+    displayStatusBar("Drowsiness Detection", "Concentration Reminder considers 100 frames for drowsiness detection."
+    "If system detects closed eyes in  30 or more frames, you are sleeping. Else, you are active", 0); 
 }
 
-void push_quit(int state, void *pointer)
+/********************************************************************************
+
+Function Name: Quit
+Description: Qt GUI in OpenCV provides a control panel to which buttons can be 
+             attached using the function, createButton. When the user presses 
+             Quit button, the application is closed.
+
+*********************************************************************************/
+
+void Quit(int state, void *pointer)
 {
     exit(0);
 }
 
-void push_pause(int state, void *pointer)
+/******************************************************************************
+
+Function Name: Pause
+Description: Qt GUI in OpenCV provides a control panel to which buttons can be 
+             attached using the function, createButton. When the user presses 
+             Pause button, the application is paused. The application can be 
+             resumed by pressing any key. The statusbar displays a message to 
+             the user, " Press any key to continue".
+
+*******************************************************************************/
+
+void Pause(int state, void *pointer)
 {
     waitKey(0);
     displayStatusBar("Drowsiness Detection", "Press any key to resume detection", 0); 
@@ -58,10 +87,12 @@ int main( int argc, const char** argv )
     Mat frame;
 
     namedWindow(window_name, CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO);
-    resizeWindow(win_name, 1280, 960);
-    createButton("Pause", push_pause, (void*) "test", CV_PUSH_BUTTON, 1);
-    createButton("Help", push_help, (void*) "test", CV_PUSH_BUTTON, 1);
-    createButton("Quit", push_quit, (void*) "test", CV_PUSH_BUTTON, 1);
+    resizeWindow(window_name, 1280, 960);
+
+    //createButton function creates button on the status bar of Qt GUI
+    createButton("Pause", Pause, (void*) "test", CV_PUSH_BUTTON, 1);
+    createButton("Help", Help, (void*) "test", CV_PUSH_BUTTON, 1);
+    createButton("Quit", Quit, (void*) "test", CV_PUSH_BUTTON, 1);
 
     //Load the cascades
     if (!face_cascade.load(face_cascade_name))
@@ -84,7 +115,7 @@ int main( int argc, const char** argv )
         int size = 100;
         int index = -1;
         int i;
-        int history[size];
+        int history[size]; // A history array with size 100
         int closed = 0; 
 
         //Initialize history[] cells to 0
@@ -117,7 +148,6 @@ int main( int argc, const char** argv )
                 {
                     history[i] = 0;
                 }
-
             }
 
 	    //Apply the classifier to the frame
@@ -161,12 +191,12 @@ int main( int argc, const char** argv )
                 }
             }
             int c = waitKey(10);
-        }
+        } 
     }
     return 0;
 }
 
-/****************************************************************************************
+/*************************************************************************
 
 Function Name: detectAndDisplay
 Input: frame, index, history[]
@@ -176,7 +206,7 @@ Description: detectAndDisplay detects face and eyes from the input frame and dra
              inserted in the corresponding index of history[]. If closed eyes are 
              detected, value 1 is inserted in the corresponding index of history[].
 
-*****************************************************************************************/
+***************************************************************************/
 
 void detectAndDisplay( Mat frame, int index, int history[] )
 {
