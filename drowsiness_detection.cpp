@@ -1,9 +1,7 @@
 /********************************************************
-
 Name:   Concentration Reminder - Drowsiness Detection
 Author: Lisa Palathingal
 Date:   12/08/2014
-
 **********************************************************/
 
 //Header files
@@ -23,12 +21,10 @@ using namespace cv;
 void detectAndDisplay (Mat frame, int index, int history[]);
 
 /*********************************************************************************
-
 Function Name: Help
 Description: Qt GUI in OpenCV provides a control panel to which buttons can be 
              attached using the function, createButton. When the user presses 
              Help button, a help manual is displayed on the status bar of Qt GUI.
-
 ***********************************************************************************/
 
 void Help(int state, void *pointer)
@@ -38,12 +34,10 @@ void Help(int state, void *pointer)
 }
 
 /********************************************************************************
-
 Function Name: Quit
 Description: Qt GUI in OpenCV provides a control panel to which buttons can be 
              attached using the function, createButton. When the user presses 
              Quit button, the application is closed.
-
 *********************************************************************************/
 
 void Quit(int state, void *pointer)
@@ -52,14 +46,12 @@ void Quit(int state, void *pointer)
 }
 
 /******************************************************************************
-
 Function Name: Pause
 Description: Qt GUI in OpenCV provides a control panel to which buttons can be 
              attached using the function, createButton. When the user presses 
              Pause button, the application is paused. The application can be 
              resumed by pressing any key. The statusbar displays a message to 
              the user, " Press any key to continue".
-
 *******************************************************************************/
 
 void Pause(int state, void *pointer)
@@ -79,7 +71,14 @@ string window_name = "Drowsiness Detection";
 
 RNG rng(12345);
 
-/*************** Function: Main ***********************/
+/************************************************************************************************
+Function Name: Main
+Description: A history array[100] is initized with value 0. Loads face and eye classifiers. 
+             Capture video from the webcamera. If video is captured, get the first frame. 
+             detectAndDisplay function is called to detect face and eyes on the frame. Closed 
+             count is incremented if history[] cell value is 1. If number of closed counts 
+             is >= 25, message is displayed indicating that the user is sleeping.
+***************************************************************************************************/
 
 int main( int argc, const char** argv )
 {
@@ -129,10 +128,10 @@ int main( int argc, const char** argv )
             frame = cvQueryFrame( capture );
             index ++;
 
-            //If index of history[] reaches the value 100, compare number of closed counts with 30
+            //If index of history[] reaches the value 100, check if number of closed counts >=25
             if(index == size)
             { 
-                if(closed >= 30)
+                if(closed >= 25)
 	        {
 	            printf("You are sleeping\n");
 		}
@@ -178,16 +177,26 @@ int main( int argc, const char** argv )
                     {
                         closed = closed + 1;
                         printf("\nCount = %d\n", closed);
-                    }
+                        if(closed >= 25)
+                        {
+                            closed = 0;
+                            printf("You are sleeping\n");
+                        }
+                    }            
                 }
 
                 else if(history[index] == 0)
                 {
-                    if(closed < 30)
+                    if(closed < 25)
                     {
                         closed = 0;
                         printf("\nCount = %d\n", closed);
-                    }
+                    }    
+                    else if(closed >= 25)
+                    {
+                        closed = 0;
+                        printf("You are sleeping\n");
+                    }       
                 }
             }
             int c = waitKey(10);
@@ -196,8 +205,7 @@ int main( int argc, const char** argv )
     return 0;
 }
 
-/*************************************************************************
-
+/***********************************************************************************
 Function Name: detectAndDisplay
 Input: frame, index, history[]
 Output: Detected eyes from the frame, updated values for history array[]
@@ -205,8 +213,7 @@ Description: detectAndDisplay detects face and eyes from the input frame and dra
              a circle around detected eyes. If open eyes are detected, value 0 is 
              inserted in the corresponding index of history[]. If closed eyes are 
              detected, value 1 is inserted in the corresponding index of history[].
-
-***************************************************************************/
+**************************************************************************************/
 
 void detectAndDisplay( Mat frame, int index, int history[] )
 {
