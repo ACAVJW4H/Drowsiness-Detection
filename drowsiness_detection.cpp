@@ -128,20 +128,10 @@ int main( int argc, const char** argv )
             frame = cvQueryFrame( capture );
             index ++;
 
-            //If index of history[] reaches the value 100, check if number of closed counts >=25
+            //If index of history[] reaches the value 100, reset index value to 0.
             if(index == size)
             { 
-                if(closed >= 25)
-	        {
-	            printf("You are sleeping\n");
-		}
-                else
-                {
-                    printf("You are active\n");
-                }
-
                 index = 0;
-		closed = 0;
                 
 		for(i = 0; i < size; i++)
                 {
@@ -177,7 +167,7 @@ int main( int argc, const char** argv )
                     {
                         closed = closed + 1;
                         printf("\nCount = %d\n", closed);
-                        if(closed >= 25)
+                        if(closed >= 30)
                         {
                             closed = 0;
                             printf("You are sleeping\n");
@@ -187,12 +177,12 @@ int main( int argc, const char** argv )
 
                 else if(history[index] == 0)
                 {
-                    if(closed < 25)
+                    if(closed < 30)
                     {
                         closed = 0;
                         printf("\nCount = %d\n", closed);
                     }    
-                    else if(closed >= 25)
+                    else if(closed >= 30)
                     {
                         closed = 0;
                         printf("You are sleeping\n");
